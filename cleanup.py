@@ -2,9 +2,6 @@ import numpy as np
 import pandas as pd
 import datetime as dt
 
-from zipfile import ZipFile
-
-zf = ZipFile('data/Train.zip')
 
 '''
 df = pd.read_csv('data/Train.csv')
@@ -16,10 +13,14 @@ price_v_year = df[['SalePrice', 'YearMade']]
 '''
 
 def load_data():
-    #df = pd.read_csv('../data/train.csv',parse_dates=True)
+    df = pd.read_csv('../data/train.zip', compression='zip')
     df['saledate'] = pd.to_datetime(df['saledate'], infer_datetime_format=True)
     df['saleyear'] = df['saledate'].dt.year
-    data = df[['ProductGroup','ProductSize','fiBaseModel','YearMade','ModelID','saledate','saleyear','UsageBand','state','SalePrice']]
+    df['ModelID'] = df['ModelID'].astype(str)
+    df = df[df['YearMade'] != 1000]
+    df['age'] = df['saleyear'] - df['YearMade']
+    df = df[df['age'] >= 0]
+    data = df[['ProductGroup','age', 'ProductSize','fiBaseModel','YearMade','ModelID','saleyear','UsageBand','state','SalePrice']]
     return data
 
 if __name__ == '__main__':
